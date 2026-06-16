@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const REGION_ENDPOINTS: Record<string, string> = {
-  'us-east-1': 'https://qstash.upstash.io',
+  'us-east-1': 'https://qstash-us-east-1.upstash.io',
   'eu-central-1': 'https://qstash-eu-central-1.upstash.io',
 };
 
