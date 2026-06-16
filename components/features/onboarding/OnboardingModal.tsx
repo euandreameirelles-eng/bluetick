@@ -428,7 +428,7 @@ export function OnboardingModal({ isConnected, onSaveCredentials, onMarkComplete
                 </button>
               </div>
               <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center shadow-lg">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shadow-lg">
                   <span className="text-3xl">🚀</span>
                 </div>
               </div>

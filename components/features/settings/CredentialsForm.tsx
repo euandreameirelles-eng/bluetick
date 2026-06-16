@@ -145,7 +145,7 @@ export const CredentialsForm = forwardRef<HTMLDivElement, CredentialsFormProps>(
             <button
               type="button"
               onClick={() => setShowTutorial(true)}
-              className="flex items-center gap-1.5 text-xs text-teal-400 hover:text-teal-300 transition-colors border border-teal-500/30 hover:border-teal-400/50 rounded-lg px-3 py-1.5 bg-teal-500/5 hover:bg-teal-500/10"
+              className="flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 transition-colors border border-amber-500/30 hover:border-amber-400/50 rounded-lg px-3 py-1.5 bg-amber-500/5 hover:bg-amber-500/10"
             >
               <BookOpen className="w-3.5 h-3.5" />
               Ver tutorial
