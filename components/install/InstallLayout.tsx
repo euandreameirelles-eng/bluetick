@@ -82,8 +82,8 @@ export function InstallLayout({
             className="mb-8 text-center"
           >
             <h1 className="text-2xl font-bold tracking-wider text-[var(--br-hologram-white)]">
-              <span className="br-text-glow-cyan">BLUE</span>
-              <span className="text-[var(--br-neon-magenta)]">TICK</span>
+              <span className="br-text-glow-cyan">blue</span>
+              <span className="text-[var(--br-neon-magenta)]">tick</span>
             </h1>
             <p className="text-xs tracking-[0.3em] text-[var(--br-muted-cyan)] mt-2 uppercase">
               Protocolo de Inicialização

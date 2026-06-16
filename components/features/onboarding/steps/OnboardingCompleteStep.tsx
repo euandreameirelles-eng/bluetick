@@ -39,7 +39,7 @@ export function OnboardingCompleteStep({
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-bold text-white">Tudo pronto!</h2>
         <p className="text-zinc-400">
-          Seu BlueTick está configurado e pronto para usar
+          Seu bluetick está configurado e pronto para usar
         </p>
       </div>
 
@@ -89,7 +89,7 @@ export function OnboardingCompleteStep({
         size="lg"
       >
         <Rocket className="w-5 h-5 mr-2" />
-        Começar a usar o BlueTick
+        Começar a usar o bluetick
       </Button>
     </div>
   );

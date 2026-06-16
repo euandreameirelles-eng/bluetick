@@ -1,6 +1,6 @@
 {
-  "name": "BlueTick Atendimento",
-  "short_name": "BlueTick",
+  "name": "bluetick Atendimento",
+  "short_name": "bluetick",
   "description": "Central de atendimento WhatsApp com IA",
   "start_url": "/atendimento",
   "scope": "/atendimento",

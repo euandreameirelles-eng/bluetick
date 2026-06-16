@@ -22,7 +22,7 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'BlueTick - WhatsApp Manager',
+  title: 'bluetick - WhatsApp Manager',
   description: 'Plataforma de automação de marketing via WhatsApp para clínicas odontológicas',
   manifest: '/manifest.json',
   icons: {
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'BlueTick',
+    title: 'bluetick',
   },
   formatDetection: {
     telephone: false,

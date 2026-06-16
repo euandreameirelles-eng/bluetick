@@ -235,7 +235,7 @@ const ExpandedSidebar = memo(function ExpandedSidebar({
         <div className="h-16 flex items-center px-2 mb-6">
           <div className="flex items-center gap-2 mr-3">
             <img src="/logo-bluetick.png" alt="BlueTick" className="w-10 h-10 object-contain" />
-            <span className="text-xl font-bold text-[var(--ds-text-primary)] tracking-tight">BlueTick</span>
+            <span className="text-xl font-bold text-[var(--ds-text-primary)] tracking-tight">bluetick</span>
           </div>
           <button
             type="button"
@@ -343,7 +343,7 @@ const ExpandedSidebar = memo(function ExpandedSidebar({
               <img src="/logo-bluetick.png" alt="BlueTick" className="w-8 h-8 object-contain" />
             </div>
             <div className="flex-1 min-w-0 text-left">
-              <p className="text-sm font-medium text-[var(--ds-text-primary)] truncate">{companyName || 'BlueTick'}</p>
+              <p className="text-sm font-medium text-[var(--ds-text-primary)] truncate">{companyName || 'bluetick'}</p>
               <p className="text-xs text-[var(--ds-text-muted)] truncate">Administrador</p>
             </div>
             {isLoggingOut ? (

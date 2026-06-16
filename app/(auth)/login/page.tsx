@@ -104,7 +104,7 @@ function LoginForm() {
           <img src="/logo-bluetick.png" alt="BlueTick" className="w-16 h-16 object-contain" />
         </div>
         <h1 className="text-2xl font-bold text-[var(--ds-text-primary)]">
-          {companyName || 'BlueTick'}
+          {companyName || 'bluetick'}
         </h1>
         <p className="text-[var(--ds-text-secondary)] mt-1">Entre para continuar</p>
       </div>
@@ -165,7 +165,7 @@ function LoginForm() {
 
       {/* Footer */}
       <p className="text-center text-[var(--ds-text-muted)] text-sm mt-6">
-        BlueTick © {new Date().getFullYear()} | by Produzza
+        bluetick © {new Date().getFullYear()} | by Produzza
       </p>
     </div>
   )
