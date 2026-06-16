@@ -2,9 +2,11 @@
 
 import React, { forwardRef, useState, useCallback, useEffect } from 'react'
 import { toast } from 'sonner'
+import { BookOpen } from 'lucide-react'
 import { Container } from '@/components/ui/container'
 import { SectionHeader } from '@/components/ui/section-header'
 import { WhatsAppCredentialsForm, type WhatsAppCredentials } from '@/components/shared/WhatsAppCredentialsForm'
+import { OnboardingModal } from '@/components/features/onboarding/OnboardingModal'
 import { settingsService } from '@/services/settingsService'
 import type { AppSettings } from '../../../types'
 import type { MetaAppInfo } from './types'
@@ -45,6 +47,7 @@ export const CredentialsForm = forwardRef<HTMLDivElement, CredentialsFormProps>(
     ref
   ) => {
     const [localIsSaving, setLocalIsSaving] = useState(false)
+    const [showTutorial, setShowTutorial] = useState(false)
 
     // Estado local para Meta App (não faz parte do settings principal)
     const [metaAppIdLocal, setMetaAppIdLocal] = useState(metaApp?.appId || '')
@@ -119,13 +122,35 @@ export const CredentialsForm = forwardRef<HTMLDivElement, CredentialsFormProps>(
     }
 
     return (
+      <>
+        {showTutorial && (
+          <OnboardingModal
+            isConnected={false}
+            tutorialMode={true}
+            forceStep="requirements"
+            onClose={() => setShowTutorial(false)}
+            onSaveCredentials={async () => {}}
+            onMarkComplete={async () => {}}
+          />
+        )}
+
       <div ref={ref} className="scroll-mt-24">
         <Container
           variant="glass"
           padding="lg"
           className="animate-in slide-in-from-top-4 duration-300"
         >
-          <SectionHeader title="Configuração da API" color="brand" showIndicator={true} />
+          <div className="flex items-center justify-between mb-0">
+            <SectionHeader title="Configuração da API" color="brand" showIndicator={true} />
+            <button
+              type="button"
+              onClick={() => setShowTutorial(true)}
+              className="flex items-center gap-1.5 text-xs text-teal-400 hover:text-teal-300 transition-colors border border-teal-500/30 hover:border-teal-400/50 rounded-lg px-3 py-1.5 bg-teal-500/5 hover:bg-teal-500/10"
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              Ver tutorial
+            </button>
+          </div>
 
           <div className="mt-6">
             <WhatsAppCredentialsForm
@@ -147,6 +172,7 @@ export const CredentialsForm = forwardRef<HTMLDivElement, CredentialsFormProps>(
           </div>
         </Container>
       </div>
+      </>
     )
   }
 )
