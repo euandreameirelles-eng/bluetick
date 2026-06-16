@@ -30,10 +30,10 @@
   --ds-text-3xl: 1.875rem;
   --ds-text-4xl: 2.25rem;
 
-  /* DS - Brand colors (Emerald - mantendo identidade SmartZap) */
-  --ds-brand-primary: #10b981;
-  --ds-brand-primary-hover: #059669;
-  --ds-brand-primary-muted: rgba(16, 185, 129, 0.1);
+  /* DS - Brand colors (Mint - identidade OdontoZap) */
+  --ds-brand-primary: #2dd4bf;
+  --ds-brand-primary-hover: #14b8a6;
+  --ds-brand-primary-muted: rgba(45, 212, 191, 0.1);
 
   /* ================================
      LIGHT MODE - Geist Inspired
@@ -52,14 +52,14 @@
   --ds-text-primary: #0a0a0a;
   --ds-text-secondary: #525252;
   --ds-text-muted: #737373;
-  --ds-text-brand: #059669;
+  --ds-text-brand: #14b8a6;
   --ds-text-disabled: #a3a3a3;
 
   /* DS - Border colors (LIGHT MODE - Geist style - visible but elegant) */
   --ds-border-subtle: rgba(0, 0, 0, 0.06);
   --ds-border-default: rgba(0, 0, 0, 0.09);
   --ds-border-strong: rgba(0, 0, 0, 0.14);
-  --ds-border-focus: #10b981;
+  --ds-border-focus: #2dd4bf;
 
   /* DS - Status colors (LIGHT MODE - Geist style) */
   --ds-status-success: #22c55e;
@@ -97,9 +97,9 @@
   --ds-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
 
   /* DS - Glow effects (LIGHT MODE - Geist: subtle focus rings) */
-  --ds-glow-brand-sm: 0 0 0 2px rgba(16, 185, 129, 0.15);
-  --ds-glow-brand-md: 0 0 0 3px rgba(16, 185, 129, 0.2);
-  --ds-glow-brand-ring: 0 0 0 2px rgba(16, 185, 129, 0.25);
+  --ds-glow-brand-sm: 0 0 0 2px rgba(45, 212, 191, 0.15);
+  --ds-glow-brand-md: 0 0 0 3px rgba(45, 212, 191, 0.2);
+  --ds-glow-brand-ring: 0 0 0 2px rgba(45, 212, 191, 0.25);
   --ds-glow-error-ring: 0 0 0 2px rgba(239, 68, 68, 0.25);
 
   /* DS - Composite shadows (LIGHT MODE - Geist style) */
@@ -109,7 +109,7 @@
   --ds-shadow-button-hover: 0 0 0 1px rgba(0, 0, 0, 0.08);
   --ds-shadow-button-primary: 0 1px 2px 0 rgba(0, 0, 0, 0.08);
   --ds-shadow-button-primary-hover: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-  --ds-shadow-input-focus: 0 0 0 2px rgba(16, 185, 129, 0.25);
+  --ds-shadow-input-focus: 0 0 0 2px rgba(45, 212, 191, 0.25);
   --ds-shadow-modal: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 16px 32px -8px rgba(0, 0, 0, 0.12);
   --ds-shadow-dropdown: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 8px 16px -4px rgba(0, 0, 0, 0.1);
 
@@ -146,18 +146,18 @@
   --color-gray-900: #18181b;
   --color-gray-950: #09090b;
 
-  /* Electric Emerald (WhatsApp Tech vibe) */
-  --color-primary-50: #ecfdf5;
-  --color-primary-100: #d1fae5;
-  --color-primary-200: #a7f3d0;
-  --color-primary-300: #6ee7b7;
-  --color-primary-400: #34d399;
-  --color-primary-500: #10b981;
-  --color-primary-600: #059669;
-  --color-primary-700: #047857;
-  --color-primary-800: #065f46;
-  --color-primary-900: #064e3b;
-  --color-primary-950: #022c22;
+  /* Mint Green (OdontoZap - saúde e cuidado) */
+  --color-primary-50: #f0fdfa;
+  --color-primary-100: #ccfbf1;
+  --color-primary-200: #99f6e4;
+  --color-primary-300: #5eead4;
+  --color-primary-400: #2dd4bf;
+  --color-primary-500: #14b8a6;
+  --color-primary-600: #0d9488;
+  --color-primary-700: #0f766e;
+  --color-primary-800: #115e59;
+  --color-primary-900: #134e4a;
+  --color-primary-950: #042f2e;
 
   /* ================================
      LANGFLOW COLOR SYSTEM
