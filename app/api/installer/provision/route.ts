@@ -177,31 +177,49 @@ async function validateVercelToken(token: string): Promise<{ projectId: string; 
   };
 }
 
+const QSTASH_REGION_ENDPOINTS = [
+  'https://qstash-us-east-1.upstash.io',
+  'https://qstash-eu-central-1.upstash.io',
+];
+
 async function validateQStashToken(token: string): Promise<void> {
-  // Detecta região via JWT (mesmo padrão de /api/installer/qstash/validate)
-  let qstashBaseUrl = 'https://qstash.upstash.io';
+  // Tenta detectar endpoint via JWT (campo iss)
+  let detectedUrl: string | null = null;
   try {
     const payloadB64 = token.split('.')[1];
     if (payloadB64) {
       const payload = JSON.parse(Buffer.from(payloadB64, 'base64url').toString());
       if (payload.iss && typeof payload.iss === 'string') {
-        qstashBaseUrl = payload.iss.replace(/\/$/, '');
+        detectedUrl = payload.iss.replace(/\/$/, '');
       }
     }
   } catch {
-    // JWT indecodificável: usa fallback genérico
+    // JWT indecodificável: tenta todos os endpoints
   }
 
-  const res = await fetchWithTimeout(`${qstashBaseUrl}/v2/schedules`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const endpointsToTry = detectedUrl
+    ? [detectedUrl, ...QSTASH_REGION_ENDPOINTS.filter(u => u !== detectedUrl)]
+    : QSTASH_REGION_ENDPOINTS;
 
-  if (!res.ok) {
+  for (const baseUrl of endpointsToTry) {
+    const res = await fetchWithTimeout(`${baseUrl}/v2/schedules`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (res.ok) return;
+
+    const body = await res.text().catch(() => '');
+
+    if (body.includes('not found in this region')) continue;
+
     if (res.status === 401 || res.status === 403) {
       throw new Error('Token QStash inválido. Copie o QSTASH_TOKEN do console Upstash → QStash → Details.');
     }
+
     throw new Error('Erro ao validar token QStash');
   }
+
+  throw new Error('Token QStash não reconhecido. Verifique se copiou o QSTASH_TOKEN correto no painel do Upstash.');
 }
 
 async function validateRedisCredentials(url: string, token: string): Promise<void> {

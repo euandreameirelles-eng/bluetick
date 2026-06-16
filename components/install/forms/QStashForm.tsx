@@ -13,7 +13,7 @@ import type { FormProps } from './types';
  * "Sistema de Transmissão" - filas de mensagens neurais.
  */
 export function QStashForm({ data, onComplete, onBack, showBack }: FormProps) {
-  const [token, setToken] = useState(data.qstashToken);
+  const [token, setToken] = useState('');
   const [validating, setValidating] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
