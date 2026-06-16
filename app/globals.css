@@ -675,11 +675,11 @@ textarea:focus-visible {
      ================================ */
 
   /* DS - Backgrounds (DARK MODE) */
-  --ds-bg-base: #09090b;
-  --ds-bg-elevated: #18181b;
-  --ds-bg-surface: #27272a;
-  --ds-bg-overlay: rgba(9, 9, 11, 0.8);
-  --ds-bg-glass: rgba(24, 24, 27, 0.7);
+  --ds-bg-base: #1B0C33;
+  --ds-bg-elevated: #241040;
+  --ds-bg-surface: #2E1554;
+  --ds-bg-overlay: rgba(27, 12, 51, 0.8);
+  --ds-bg-glass: rgba(36, 16, 64, 0.7);
   --ds-bg-hover: rgba(255, 255, 255, 0.05);
 
   /* DS - Text colors (DARK MODE) */
