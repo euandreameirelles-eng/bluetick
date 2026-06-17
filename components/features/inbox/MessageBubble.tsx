@@ -156,15 +156,20 @@ function parseTemplateMessage(content: string): ParsedTemplateMessage | null {
   return result
 }
 
+function proxyUrl(url: string): string {
+  return `/api/media/proxy?url=${encodeURIComponent(url)}`
+}
+
 function MediaContent({ message }: { message: InboxMessage }) {
   const { message_type, media_url } = message
 
   if (message_type === 'image') {
     if (media_url) {
+      const src = proxyUrl(media_url)
       return (
-        <a href={media_url} target="_blank" rel="noopener noreferrer">
+        <a href={src} target="_blank" rel="noopener noreferrer">
           <img
-            src={media_url}
+            src={src}
             alt="Imagem"
             className="max-w-[240px] rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
           />
@@ -180,7 +185,7 @@ function MediaContent({ message }: { message: InboxMessage }) {
 
   if (message_type === 'audio') {
     if (media_url) {
-      return <audio controls src={media_url} className="max-w-[240px] h-10" />
+      return <audio controls src={proxyUrl(media_url)} className="max-w-[240px] h-10" />
     }
     return (
       <span className="flex items-center gap-1.5 text-zinc-400 text-sm italic py-0.5">
@@ -192,7 +197,7 @@ function MediaContent({ message }: { message: InboxMessage }) {
   if (message_type === 'video') {
     if (media_url) {
       return (
-        <video controls src={media_url} className="max-w-[240px] rounded-lg" />
+        <video controls src={proxyUrl(media_url)} className="max-w-[240px] rounded-lg" />
       )
     }
     return (
@@ -206,7 +211,7 @@ function MediaContent({ message }: { message: InboxMessage }) {
     if (media_url) {
       return (
         <a
-          href={media_url}
+          href={proxyUrl(media_url)}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1.5 text-blue-400 hover:text-blue-300 text-sm underline py-0.5"
