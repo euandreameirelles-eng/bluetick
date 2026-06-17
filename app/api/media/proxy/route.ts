@@ -28,16 +28,23 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Host não permitido' }, { status: 403 })
   }
 
-  const credentials = await getWhatsAppCredentials()
-  if (!credentials?.accessToken) {
-    return NextResponse.json({ error: 'Credenciais do WhatsApp não configuradas' }, { status: 500 })
+  // URLs com hash já são auto-assinadas pela Meta — não precisam de Bearer token.
+  // URLs sem hash (ex: endpoint /media/{id} do Graph API) precisam do token.
+  const isHashSigned = parsed.searchParams.has('hash')
+
+  const fetchHeaders: Record<string, string> = {}
+
+  if (!isHashSigned) {
+    const credentials = await getWhatsAppCredentials()
+    if (!credentials?.accessToken) {
+      return NextResponse.json({ error: 'Credenciais do WhatsApp não configuradas' }, { status: 500 })
+    }
+    fetchHeaders['Authorization'] = `Bearer ${credentials.accessToken}`
   }
 
   let metaResponse: Response
   try {
-    metaResponse = await fetch(url, {
-      headers: { Authorization: `Bearer ${credentials.accessToken}` },
-    })
+    metaResponse = await fetch(url, { headers: fetchHeaders })
   } catch {
     return NextResponse.json({ error: 'Falha ao buscar mídia na Meta' }, { status: 502 })
   }
