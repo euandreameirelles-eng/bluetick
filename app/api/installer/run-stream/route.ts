@@ -12,6 +12,12 @@ import {
 export const maxDuration = 300;
 export const runtime = 'nodejs';
 
+// O endpoint global roteia automaticamente para a região correta via token,
+// evitando o erro "user not found in this region".
+function detectQStashUrl(_token: string): string {
+  return 'https://qstash.upstash.io';
+}
+
 // Health check result schema (do /api/installer/health-check)
 const HealthCheckResultSchema = z.object({
   skipWaitProject: z.boolean().default(false),
@@ -339,6 +345,7 @@ export async function POST(req: Request) {
 
         // QStash
         { key: 'QSTASH_TOKEN', value: upstash.qstashToken, targets: envTargets },
+        { key: 'QSTASH_URL', value: detectQStashUrl(upstash.qstashToken), targets: envTargets },
 
         // Redis
         { key: 'UPSTASH_REDIS_REST_URL', value: upstash.redisRestUrl, targets: envTargets },

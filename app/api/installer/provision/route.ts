@@ -177,13 +177,15 @@ async function validateVercelToken(token: string): Promise<{ projectId: string; 
   };
 }
 
+const QSTASH_GLOBAL_URL = 'https://qstash.upstash.io';
 const QSTASH_REGION_ENDPOINTS = [
+  QSTASH_GLOBAL_URL,
   'https://qstash-us-east-1.upstash.io',
   'https://qstash-eu-central-1.upstash.io',
 ];
 
-async function validateQStashToken(token: string): Promise<void> {
-  // Tenta detectar endpoint via JWT (campo iss)
+async function validateQStashToken(token: string): Promise<string> {
+  // Tenta detectar endpoint via JWT (campo iss) — apenas para validação
   let detectedUrl: string | null = null;
   try {
     const payloadB64 = token.split('.')[1];
@@ -206,7 +208,10 @@ async function validateQStashToken(token: string): Promise<void> {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    if (res.ok) return;
+    // Independente da região detectada, sempre salva o endpoint global.
+    // O endpoint global roteia automaticamente para a região correta via token,
+    // evitando o erro "user not found in this region".
+    if (res.ok) return QSTASH_GLOBAL_URL;
 
     const body = await res.text().catch(() => '');
 
@@ -614,7 +619,7 @@ export async function POST(req: Request) {
         subtitle: step6.subtitle,
       });
 
-      await validateQStashToken(qstash.token);
+      const qstashUrl = await validateQStashToken(qstash.token);
       console.log('[provision] ✅ Step 6/12: Validate QStash - COMPLETO');
       stepIndex++;
 
@@ -650,6 +655,7 @@ export async function POST(req: Request) {
         { key: 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY', value: anonKey, targets: [...envTargets] },
         { key: 'SUPABASE_SECRET_KEY', value: serviceRoleKey, targets: [...envTargets] },
         { key: 'QSTASH_TOKEN', value: qstash.token, targets: [...envTargets] },
+        { key: 'QSTASH_URL', value: qstashUrl, targets: [...envTargets] },
         { key: 'UPSTASH_REDIS_REST_URL', value: redis.restUrl, targets: [...envTargets] },
         { key: 'UPSTASH_REDIS_REST_TOKEN', value: redis.restToken, targets: [...envTargets] },
         { key: 'MASTER_PASSWORD', value: passwordHash, targets: [...envTargets] },
