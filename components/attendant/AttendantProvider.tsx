@@ -45,6 +45,8 @@ interface AttendantProviderProps {
   token: string | null
 }
 
+const STORAGE_KEY = 'bluetick:attendant_token'
+
 export function AttendantProvider({ children, token }: AttendantProviderProps) {
   const [isReady, setIsReady] = useState(false)
   const [isValidating, setIsValidating] = useState(true)
@@ -53,8 +55,11 @@ export function AttendantProvider({ children, token }: AttendantProviderProps) {
   const [attendant, setAttendant] = useState<AttendantInfo | null>(null)
 
   // Validar token na montagem
+  // Se não há token na URL (ex: app instalado na tela inicial), tenta restaurar do armazenamento local
   useEffect(() => {
-    if (!token) {
+    const tokenToUse = token ?? (typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null)
+
+    if (!tokenToUse) {
       setIsValidating(false)
       setIsReady(true)
       setError('Token não informado')
@@ -66,7 +71,7 @@ export function AttendantProvider({ children, token }: AttendantProviderProps) {
         const res = await fetch('/api/attendants/validate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token }),
+          body: JSON.stringify({ token: tokenToUse }),
         })
 
         const data = await res.json()
@@ -75,9 +80,17 @@ export function AttendantProvider({ children, token }: AttendantProviderProps) {
           setAttendant(data.attendant)
           setIsAuthenticated(true)
           setError(null)
+          // Salva token para funcionar quando aberto pela tela inicial (sem ?token= na URL)
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(STORAGE_KEY, tokenToUse)
+          }
         } else {
           setError(data.error || 'Token inválido')
           setIsAuthenticated(false)
+          // Remove token inválido/expirado do armazenamento local
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem(STORAGE_KEY)
+          }
         }
       } catch (err) {
         console.error('[AttendantProvider] Erro ao validar token:', err)
