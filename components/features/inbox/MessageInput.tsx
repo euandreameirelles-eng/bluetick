@@ -12,7 +12,7 @@
  */
 
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react'
-import { Send, Loader2, Sparkles } from 'lucide-react'
+import { Send, Loader2, Sparkles, Smile } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -20,6 +20,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import EmojiPicker, { type EmojiClickData, Theme } from 'emoji-picker-react'
 import { QuickRepliesPopover } from './QuickRepliesPopover'
 import type { InboxQuickReply } from '@/types'
 
@@ -54,6 +60,7 @@ export function MessageInput({
   const [suggestionNotes, setSuggestionNotes] = useState<string | null>(null)
   const [isFocused, setIsFocused] = useState(false)
   const [selectedShortcutIndex, setSelectedShortcutIndex] = useState(0)
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const autocompleteRef = useRef<HTMLDivElement>(null)
   const wasSendingRef = useRef(false)
@@ -223,6 +230,24 @@ export function MessageInput({
     }
   }, [conversationId, isLoadingSuggestion, disabled])
 
+  // Insert emoji at cursor position
+  const handleEmojiClick = useCallback((emojiData: EmojiClickData) => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+
+    const start = textarea.selectionStart ?? value.length
+    const end = textarea.selectionEnd ?? value.length
+    const newValue = value.slice(0, start) + emojiData.emoji + value.slice(end)
+    setValue(newValue)
+    setEmojiPickerOpen(false)
+
+    setTimeout(() => {
+      textarea.focus()
+      const pos = start + emojiData.emoji.length
+      textarea.setSelectionRange(pos, pos)
+    }, 0)
+  }, [value])
+
   // Clear suggestion notes when value is cleared
   useEffect(() => {
     if (suggestionNotes && value.trim() === '') {
@@ -286,6 +311,41 @@ export function MessageInput({
             </TooltipContent>
           </Tooltip>
         )}
+
+        {/* Emoji picker */}
+        <Popover open={emojiPickerOpen} onOpenChange={setEmojiPickerOpen}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <PopoverTrigger asChild>
+                <button
+                  disabled={disabled}
+                  className={cn(
+                    'h-9 w-9 shrink-0 rounded-lg flex items-center justify-center',
+                    'transition-all duration-150',
+                    !disabled
+                      ? 'text-[var(--ds-text-secondary)] hover:text-[var(--ds-text-primary)] hover:bg-[var(--ds-bg-hover)]'
+                      : 'text-[var(--ds-text-muted)] cursor-not-allowed'
+                  )}
+                >
+                  <Smile className="h-4 w-4" />
+                </button>
+              </PopoverTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="text-xs">
+              Emoji
+            </TooltipContent>
+          </Tooltip>
+          <PopoverContent side="top" align="start" className="w-auto p-0 border-none shadow-xl">
+            <EmojiPicker
+              onEmojiClick={handleEmojiClick}
+              theme={Theme.DARK}
+              lazyLoadEmojis
+              searchPlaceholder="Buscar emoji..."
+              height={380}
+              width={320}
+            />
+          </PopoverContent>
+        </Popover>
 
         {/* Input area */}
         <div className="flex-1 relative">

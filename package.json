@@ -89,6 +89,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
+    "emoji-picker-react": "^4.19.1",
     "geist": "^1.5.1",
     "jotai": "^2.15.1",
     "jszip": "^3.10.1",
