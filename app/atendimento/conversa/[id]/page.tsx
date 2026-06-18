@@ -27,7 +27,17 @@ import {
   Sparkles,
   Sun,
   Moon,
+  Smile,
+  MessageSquareDashed,
+  Search,
+  X,
 } from 'lucide-react'
+import EmojiPicker, { type EmojiClickData, Theme } from 'emoji-picker-react'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { useAttendant } from '@/components/attendant/AttendantProvider'
 import { useTheme } from '../../layout'
 import { toast } from 'sonner'
@@ -72,6 +82,13 @@ type ConversationStatus = 'ai_active' | 'human_active' | 'handoff_requested'
 // API FUNCTIONS
 // =============================================================================
 
+interface QuickReply {
+  id: string
+  title: string
+  content: string
+  shortcut: string | null
+}
+
 type FetchFn = (url: string, options?: RequestInit) => Promise<Response>
 
 async function fetchConversation(id: string, fetchFn: FetchFn): Promise<Conversation> {
@@ -107,6 +124,16 @@ async function takeoverConversation(id: string, fetchFn: FetchFn): Promise<void>
 async function returnToBot(id: string, fetchFn: FetchFn): Promise<void> {
   const res = await fetchFn(`/api/inbox/conversations/${id}/return-to-bot`, { method: 'POST' })
   if (!res.ok) throw new Error('Erro ao devolver para IA')
+}
+
+async function fetchQuickReplies(fetchFn: FetchFn): Promise<QuickReply[]> {
+  try {
+    const res = await fetchFn('/api/inbox/quick-replies')
+    if (!res.ok) return []
+    return res.json()
+  } catch {
+    return []
+  }
 }
 
 // =============================================================================
@@ -388,14 +415,21 @@ function MessageInput({
   onSend,
   isLoading,
   disabled,
+  quickReplies,
+  resolvedTheme,
 }: {
   value: string
   onChange: (value: string) => void
   onSend: () => void
   isLoading: boolean
   disabled: boolean
+  quickReplies: QuickReply[]
+  resolvedTheme: 'light' | 'dark'
 }) {
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const [emojiOpen, setEmojiOpen] = useState(false)
+  const [qrOpen, setQrOpen] = useState(false)
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     if (inputRef.current) {
@@ -411,9 +445,131 @@ function MessageInput({
     }
   }
 
+  const handleEmojiClick = (emojiData: EmojiClickData) => {
+    const textarea = inputRef.current
+    if (!textarea) return
+    const start = textarea.selectionStart ?? value.length
+    const end = textarea.selectionEnd ?? value.length
+    const newValue = value.slice(0, start) + emojiData.emoji + value.slice(end)
+    onChange(newValue)
+    setEmojiOpen(false)
+    setTimeout(() => {
+      textarea.focus()
+      const pos = start + emojiData.emoji.length
+      textarea.setSelectionRange(pos, pos)
+    }, 0)
+  }
+
+  const handleQuickReplySelect = (content: string) => {
+    onChange(value.trim() ? `${value.trimEnd()} ${content}` : content)
+    setQrOpen(false)
+    setSearch('')
+    setTimeout(() => inputRef.current?.focus(), 0)
+  }
+
+  const filteredReplies = quickReplies.filter((qr) => {
+    if (!search.trim()) return true
+    const s = search.toLowerCase()
+    return (
+      qr.title.toLowerCase().includes(s) ||
+      qr.content.toLowerCase().includes(s) ||
+      qr.shortcut?.toLowerCase().includes(s)
+    )
+  })
+
   return (
-    <div className="shrink-0 px-4 py-3 border-t border-[var(--geist-border)] bg-[var(--geist-background)]">
-      <div className="flex items-end gap-3">
+    <div className="shrink-0 border-t border-[var(--geist-border)] bg-[var(--geist-background)]">
+      <div className="flex items-end gap-2 px-3 py-3">
+        {/* Respostas rápidas */}
+        <Popover open={qrOpen} onOpenChange={setQrOpen}>
+          <PopoverTrigger asChild>
+            <button
+              disabled={disabled}
+              aria-label="Respostas rápidas"
+              className="w-9 h-9 rounded-lg flex items-center justify-center text-[var(--geist-foreground-secondary)] hover:text-[var(--geist-foreground)] hover:bg-[var(--geist-component-bg)] transition-colors disabled:opacity-40 shrink-0"
+            >
+              <MessageSquareDashed size={18} />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent side="top" align="start" className="w-80 p-0">
+            <div className="p-3 border-b border-[var(--geist-border)]">
+              <p className="text-sm font-medium mb-2">Respostas rápidas</p>
+              <div className="relative">
+                <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--geist-foreground-tertiary)]" />
+                <input
+                  type="text"
+                  placeholder="Buscar..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-8 pr-8 py-1.5 text-sm rounded-lg bg-[var(--geist-component-bg)] border border-[var(--geist-border)] focus:outline-none focus:border-[var(--geist-blue)]"
+                  autoFocus
+                />
+                {search && (
+                  <button
+                    onClick={() => setSearch('')}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--geist-foreground-tertiary)]"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="max-h-[260px] overflow-y-auto">
+              {filteredReplies.length === 0 ? (
+                <p className="p-4 text-sm text-center text-[var(--geist-foreground-tertiary)]">
+                  {search ? 'Nenhuma resposta encontrada' : 'Nenhuma resposta rápida cadastrada'}
+                </p>
+              ) : (
+                <div className="p-1">
+                  {filteredReplies.map((qr) => (
+                    <button
+                      key={qr.id}
+                      onClick={() => handleQuickReplySelect(qr.content)}
+                      className="w-full px-3 py-2 rounded-md text-left hover:bg-[var(--geist-component-bg)] transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium truncate">{qr.title}</span>
+                        {qr.shortcut && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--geist-component-bg)] text-[var(--geist-foreground-secondary)] font-mono shrink-0">
+                            /{qr.shortcut}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-[var(--geist-foreground-tertiary)] mt-0.5 line-clamp-1">
+                        {qr.content}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        {/* Emoji */}
+        <Popover open={emojiOpen} onOpenChange={setEmojiOpen}>
+          <PopoverTrigger asChild>
+            <button
+              disabled={disabled}
+              aria-label="Emoji"
+              className="w-9 h-9 rounded-lg flex items-center justify-center text-[var(--geist-foreground-secondary)] hover:text-[var(--geist-foreground)] hover:bg-[var(--geist-component-bg)] transition-colors disabled:opacity-40 shrink-0"
+            >
+              <Smile size={18} />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent side="top" align="start" className="w-auto p-0 border-none shadow-xl">
+            <EmojiPicker
+              onEmojiClick={handleEmojiClick}
+              theme={resolvedTheme === 'dark' ? Theme.DARK : Theme.LIGHT}
+              lazyLoadEmojis
+              searchPlaceholder="Buscar emoji..."
+              height={380}
+              width={320}
+            />
+          </PopoverContent>
+        </Popover>
+
+        {/* Textarea */}
         <textarea
           ref={inputRef}
           value={value}
@@ -424,21 +580,16 @@ function MessageInput({
           disabled={disabled}
           className="flex-1 px-4 py-2.5 rounded-xl bg-[var(--geist-component-bg)] text-[var(--geist-foreground)] placeholder:text-[var(--geist-foreground-tertiary)] text-[14px] resize-none focus:outline-none focus:ring-2 focus:ring-[var(--geist-blue)] max-h-[120px] disabled:opacity-50 border border-[var(--geist-border)] focus:border-[var(--geist-blue)]"
         />
+
+        {/* Enviar */}
         <button
           onClick={onSend}
           disabled={!value.trim() || isLoading || disabled}
           className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 disabled:opacity-30 hover:scale-105 transition-all shadow-lg"
-          style={{
-            backgroundColor: 'var(--geist-blue)',
-            color: '#ffffff',
-          }}
+          style={{ backgroundColor: 'var(--geist-blue)', color: '#ffffff' }}
           aria-label="Enviar"
         >
-          {isLoading ? (
-            <Loader2 size={18} className="animate-spin" />
-          ) : (
-            <Send size={18} />
-          )}
+          {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
         </button>
       </div>
     </div>
@@ -485,6 +636,13 @@ export default function ConversaPage() {
     queryFn: () => fetchMessages(conversationId, attendantFetch, 100),
     enabled: isAuthenticated,
     refetchInterval: 3000,
+  })
+
+  const { data: quickReplies = [] } = useQuery({
+    queryKey: ['attendant-quick-replies'],
+    queryFn: () => fetchQuickReplies(attendantFetch),
+    enabled: isAuthenticated,
+    staleTime: 60000,
   })
 
   const messages = messagesData?.messages ?? []
@@ -603,6 +761,8 @@ export default function ConversaPage() {
           onSend={handleSend}
           isLoading={sendMutation.isPending}
           disabled={false}
+          quickReplies={quickReplies}
+          resolvedTheme={resolvedTheme}
         />
       ) : !canReply ? (
         <DisabledInputNotice message="Você tem permissão apenas para visualizar" />
