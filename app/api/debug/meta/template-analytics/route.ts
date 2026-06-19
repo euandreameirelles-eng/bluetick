@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { verifyApiKey, unauthorizedResponse } from '@/lib/auth'
 import { getWhatsAppCredentials } from '@/lib/whatsapp-credentials'
 import { fetchWithTimeout, safeJson, isAbortError } from '@/lib/server-http'
 
 // GET /api/debug/meta/template-analytics?name=<template_name>&start=<unix>&end=<unix>&granularity=daily
 // Retorna métricas oficiais da Meta (sent/delivered/read) para um template em um intervalo.
 export async function GET(request: NextRequest) {
+  const authResult = await verifyApiKey(request)
+  if (!authResult.valid) return unauthorizedResponse(authResult.error)
+
   try {
     const url = new URL(request.url)
     const name = url.searchParams.get('name')?.trim()

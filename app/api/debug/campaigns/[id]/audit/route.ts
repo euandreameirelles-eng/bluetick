@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { verifyApiKey, unauthorizedResponse } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
@@ -26,7 +27,10 @@ function safeCount(x: any): number {
  * Diagnóstico de contadores e estado por contato (sem PII).
  * Útil para validar discrepâncias de delivered/read.
  */
-export async function GET(_req: Request, { params }: Params) {
+export async function GET(request: NextRequest, { params }: Params) {
+  const authResult = await verifyApiKey(request)
+  if (!authResult.valid) return unauthorizedResponse(authResult.error)
+
   const { id: campaignId } = await params
 
   if (!campaignId) {

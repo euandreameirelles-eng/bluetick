@@ -100,8 +100,10 @@ async function sendExternalWebhook(payload: Record<string, unknown>): Promise<vo
 
 function verifyMetaWebhookSignature(input: { request: NextRequest; rawBody: string }): boolean {
   const appSecret = String(process.env.META_APP_SECRET || '').trim()
-  // Compatibility mode: if not configured, do not block (but once configured, enforce).
-  if (!appSecret) return true
+  if (!appSecret) {
+    console.error('[SEC] META_APP_SECRET não configurado — webhook rejeitado por segurança')
+    return false
+  }
 
   const header =
     input.request.headers.get('x-hub-signature-256') ||
@@ -510,10 +512,9 @@ export async function GET(request: NextRequest) {
   console.log(`- Received Token: ${maskTokenPreview(token)}`)
   console.log(`- Expected Token: ${maskTokenPreview(MY_VERIFY_TOKEN)}`)
 
-  if (MY_VERIFY_TOKEN === 'token-not-found-readonly') {
-    console.warn(
-      '⚠️ Webhook verify token ausente em modo readonly. Configure em settings (webhook_verify_token) ou via env WEBHOOK_VERIFY_TOKEN.'
-    )
+  if (MY_VERIFY_TOKEN === 'token-not-found-readonly' || !MY_VERIFY_TOKEN) {
+    console.error('[SEC] Webhook verify token não configurado — verificação rejeitada por segurança')
+    return new Response('Forbidden', { status: 403 })
   }
 
   if (mode === 'subscribe' && token === MY_VERIFY_TOKEN) {

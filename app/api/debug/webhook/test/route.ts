@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { verifyApiKey, unauthorizedResponse } from '@/lib/auth'
 
 export const runtime = 'nodejs'
 
@@ -7,6 +8,9 @@ function ensureDev() {
 }
 
 export async function POST(request: NextRequest) {
+  const authResult = await verifyApiKey(request)
+  if (!authResult.valid) return unauthorizedResponse(authResult.error)
+
   if (!ensureDev()) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   const body = await request.json().catch(() => ({}))
   const url = typeof body?.url === 'string' ? body.url.trim() : ''

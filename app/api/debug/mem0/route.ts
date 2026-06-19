@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { verifyApiKey, unauthorizedResponse } from '@/lib/auth'
 import { settingsDb } from '@/lib/supabase-db'
 import { isSupabaseConfigured } from '@/lib/supabase'
 
@@ -10,7 +11,10 @@ const mask = (value: string | null) => {
   return `${value.slice(0, 4)}••••${value.slice(-4)}`
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const authResult = await verifyApiKey(request)
+  if (!authResult.valid) return unauthorizedResponse(authResult.error)
+
   try {
     const supabaseConfigured = isSupabaseConfigured()
     const envMem0Key = process.env.MEM0_API_KEY || null

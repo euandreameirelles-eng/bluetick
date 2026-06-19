@@ -148,7 +148,7 @@ export async function POST(request: Request, { params }: Params) {
   } catch (error: any) {
     console.error('Failed to submit lead form:', error)
     return NextResponse.json(
-      { error: 'Falha ao enviar formulário', details: String(error?.message || '') },
+      { error: 'Falha ao enviar formulário' },
       { status: 500, headers: corsHeaders() }
     )
   }
