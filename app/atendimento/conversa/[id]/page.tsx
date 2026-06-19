@@ -41,6 +41,7 @@ import {
 import { useAttendant } from '@/components/attendant/AttendantProvider'
 import { useTheme } from '../../layout'
 import { toast } from 'sonner'
+import { isWindowOpen } from '@/lib/inbox/window-utils'
 
 // =============================================================================
 // TYPES
@@ -716,7 +717,8 @@ export default function ConversaPage() {
     )
   }
 
-  const canSendMessages = canReply && status === 'human_active'
+  const windowOpen = isWindowOpen(conversation.last_customer_message_at)
+  const canSendMessages = canReply && status === 'human_active' && windowOpen
 
   return (
     <div className="flex flex-col h-screen bg-[var(--geist-background)]">
@@ -766,8 +768,10 @@ export default function ConversaPage() {
         />
       ) : !canReply ? (
         <DisabledInputNotice message="Você tem permissão apenas para visualizar" />
-      ) : (
+      ) : status !== 'human_active' ? (
         <DisabledInputNotice message="Assuma o atendimento para enviar mensagens" />
+      ) : (
+        <DisabledInputNotice message="Janela de 24h encerrada — aguarde o cliente responder ou use um template" />
       )}
     </div>
   )

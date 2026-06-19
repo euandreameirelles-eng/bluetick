@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils'
 import { MessageBubble } from './MessageBubble'
 import { MessageInput } from './MessageInput'
 import { ConversationHeader } from './ConversationHeader'
+import { isWindowOpen } from '@/lib/inbox/window-utils'
 import type {
   InboxConversation,
   InboxMessage,
@@ -97,6 +98,7 @@ export function MessagePanel({
   const isAtBottomRef = useRef(true)
   const prevMessagesLengthRef = useRef(messages.length)
   const [showScrollButton, setShowScrollButton] = useState(false)
+  const windowOpen = isWindowOpen(conversation?.last_customer_message_at ?? null)
 
   // Check if user is at bottom
   const checkIfAtBottom = useCallback(() => {
@@ -285,20 +287,30 @@ export function MessagePanel({
       )}
 
       {/* Input area */}
+      {isOpen && !windowOpen && (
+        <div className="px-4 py-2 bg-amber-500/10 border-t border-amber-500/20 flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Janela de 24h encerrada. Aguarde o cliente responder ou envie um template.
+        </div>
+      )}
       <MessageInput
         onSend={onSendMessage}
         isSending={isSending}
-        disabled={!isOpen}
+        disabled={!isOpen || !windowOpen}
         placeholder={
-          isOpen
-            ? 'Mensagem...'
-            : 'Conversa fechada'
+          !isOpen
+            ? 'Conversa fechada'
+            : !windowOpen
+              ? 'Janela de 24h encerrada — aguarde o cliente responder'
+              : 'Mensagem...'
         }
         quickReplies={quickReplies}
         quickRepliesLoading={quickRepliesLoading}
         onRefreshQuickReplies={onRefreshQuickReplies}
         conversationId={conversation?.id}
-        showAISuggest={isOpen && conversation?.mode === 'human'}
+        showAISuggest={isOpen && windowOpen && conversation?.mode === 'human'}
       />
     </div>
   )
