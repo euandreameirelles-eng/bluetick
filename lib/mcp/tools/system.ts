@@ -255,6 +255,7 @@ export function registerSystemTools(server: McpServer) {
             unread_count: 1,
             total_messages: messages.length,
             last_message_at: new Date().toISOString(),
+            last_customer_message_at: null,
             last_message_preview: userMsg,
             automation_paused_until: null,
             automation_paused_by: null,
