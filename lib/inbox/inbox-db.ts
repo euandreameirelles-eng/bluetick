@@ -555,14 +555,16 @@ async function updateConversationOnNewMessageFallback(
   const currentTotal = current?.total_messages || 0
   const currentUnread = current?.unread_count || 0
 
+  const now = new Date().toISOString()
   const updates: Record<string, unknown> = {
     total_messages: currentTotal + 1,
-    last_message_at: new Date().toISOString(),
+    last_message_at: now,
     last_message_preview: preview,
   }
 
   if (direction === 'inbound') {
     updates.unread_count = currentUnread + 1
+    updates.last_customer_message_at = now
   }
 
   await supabase
