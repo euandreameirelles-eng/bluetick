@@ -75,6 +75,7 @@ interface Conversation {
   contact?: Contact | null
   ai_agent?: { name: string } | null
   last_message_at: string
+  last_customer_message_at: string | null
 }
 
 type ConversationStatus = 'ai_active' | 'human_active' | 'handoff_requested'
